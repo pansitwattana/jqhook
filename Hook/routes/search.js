@@ -1,4 +1,5 @@
 ﻿var express = require('express');
+var firebase = require("firebase");
 var router = express.Router();
 
 var searchjson = {
@@ -28,7 +29,10 @@ var searchjson = {
 
 /* GET users listing. */
 router.get('/', function (req, res) {
+
+    //var db = GetFireDB();
     res.json(searchjson);
+    //res.json(db);
 });
 
 
@@ -40,11 +44,29 @@ router.get('/:name', function (req, res) {
         return element.name == searchName;
     }
 
+
     var storeResults = searchjson.stores.filter(match);
 
     var searchResult = { stores: storeResults };
 
     res.json(searchResult);
 });
+
+//function GetFireDB()
+//{
+//    // Set the configuration for your app
+//    // TODO: Replace with your project's config object
+//    var config = {
+//        apiKey: "AIzaSyBW3LXE8QvIvAWmcQLEJEfRu4MMy5-EbFA",
+//        authDomain: "hook-f936a.firebaseapp.com",
+//        databaseURL: "https://hook-f936a.firebaseio.com",
+//        storageBucket: "hook-f936a.appspot.com"
+//    };
+//    firebase.initializeApp(config);
+
+//    // Get a reference to the database service
+//    var database = firebase.database();
+//    return database;
+//}
 
 module.exports = router;

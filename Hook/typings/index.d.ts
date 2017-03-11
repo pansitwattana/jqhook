@@ -3,6 +3,7 @@
 /// <reference path="globals/debug/index.d.ts" />
 /// <reference path="globals/express-serve-static-core/index.d.ts" />
 /// <reference path="globals/express/index.d.ts" />
+/// <reference path="globals/firebase/index.d.ts" />
 /// <reference path="globals/jade/index.d.ts" />
 /// <reference path="globals/mime/index.d.ts" />
 /// <reference path="globals/morgan/index.d.ts" />

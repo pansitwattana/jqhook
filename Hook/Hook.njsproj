@@ -32,6 +32,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="app.js" />
+    <Compile Include="routes\database.js" />
     <Compile Include="routes\index.js" />
     <Compile Include="routes\search.js" />
     <Compile Include="routes\users.js" />

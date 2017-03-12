@@ -1,9 +1,6 @@
-﻿var express = require('express');
-var firebase = require("firebase");
-var router = express.Router();
-
-
-
+﻿var express = require('express')
+var firebase = require('firebase')
+var router = express.Router()
 
 // var write = function writeUserData(userId, name, email, imageUrl) {
 //     firebase.database().ref('users/' + userId).set({
@@ -12,33 +9,6 @@ var router = express.Router();
 //         profile_picture : imageUrl
 //     });
 // }
-
-
-
-var searchjson = {
-    stores : [
-        {
-            name: 'tokai',
-            img: 'https://th.openrice.com/userphoto/Article/0/V/0006BBF9E616E90551D87Dj.jpg',
-            detail: 'detail',
-            open: true,
-            coordinates: {
-                lat: 37.330576,
-                long: -122.029739
-            }
-        },
-        {
-            name: 'hor5',
-            img: 'http://cmlive.in.th/home/wp-content/uploads/2013/01/DSC_4262.jpg',
-            detail: 'up2u',
-            open: false,
-            coordinates: {
-                lat: 37.330576,
-                long: -122.029739
-            }
-        }
-    ]
-}
 
 /* GET users listing. */
 router.get('/', function (req, res) {
@@ -64,16 +34,15 @@ router.get('/', function (req, res) {
     // console.log(username);
 
     //var userId = firebase.auth().currentUser.uid;
-
-    var dbRefObject = firebase.database().ref().child('Stores');
-    dbRefObject.once('value').then(function(snapshot){
-        res.json(snapshot.val());
-    });
-}); 
+	var dbRefObject = firebase.database().ref().child('Stores')
+	dbRefObject.once('value').then(function(snapshot){
+    	res.json(snapshot.val())
+	})
+});
 
 
 router.get('/:name', function (req, res) {
-    var searchName = req.params.name;
+	var searchName = req.params.name
 
     // //var result = find(searchjson, searchName);
     // function match(element) {
@@ -87,11 +56,11 @@ router.get('/:name', function (req, res) {
 
     // res.json(searchResult);
 
-    var dbRefObject = firebase.database().ref().child('Stores/' + searchName);
-    dbRefObject.once('value').then(function(snapshot){
-        res.json(snapshot.val());
-    });
-});
+	var dbRefObject = firebase.database().ref().child('Stores/' + searchName)
+	dbRefObject.once('value').then(function(snapshot){
+		res.json(snapshot.val())
+	})
+})
 
 // function GetFireDB()
 // {
@@ -110,4 +79,4 @@ router.get('/:name', function (req, res) {
 //     return database;
 // }
 
-module.exports = router;
+module.exports = router

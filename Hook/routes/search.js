@@ -56,10 +56,37 @@ router.get('/:name', function (req, res) {
 
     // res.json(searchResult);
 
-	var dbRefObject = firebase.database().ref().child('Stores/' + searchName)
+    //------------------------------------------------------------------------
+	/*var dbRefObject = firebase.database().ref().child('Stores/' + searchName)
 	dbRefObject.once('value').then(function(snapshot){
 		res.json(snapshot.val())
-	})
+    }) */
+    //------------------------------------------------------------------------
+
+
+
+    var Result_Json = ' { "Stores" : [ ';
+    var Childnum = 0;
+
+    firebase.database().ref().child('Stores').on('value', function (snap) {
+        snap.forEach(function (snap2) {
+            if (snap2.key.includes(searchName)) {
+
+                if (Childnum != 0) {
+                    Result_Json += ",";
+                }
+                //Result_Json += snap2.key + "</p>" + JSON.stringify(snap2.val()) + "</p>";  
+                Result_Json += JSON.stringify(snap2.val());  
+                Childnum++;          
+            }
+        });
+    });
+
+    Result_Json += ']}';
+    res.send(Result_Json);
+ 
+
+
 })
 
 // function GetFireDB()

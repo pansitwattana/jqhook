@@ -65,26 +65,37 @@ router.get('/:name', function (req, res) {
 
 
 
-    var Result_Json = ' { "Stores" : [ ';
-    var Childnum = 0;
+    //var Result_Json = ' { "Stores" : [ ';
+    //var Childnum = 0;
 
-    firebase.database().ref().child('Stores').on('value', function (snap) {
-        snap.forEach(function (snap2) {
-            if (snap2.key.includes(searchName)) {
+    //firebase.database().ref().child('Stores').on('value', function (snap) {
+    //    snap.forEach(function (snap2) {
+    //        if (snap2.key.includes(searchName)) {
 
-                if (Childnum != 0) {
-                    Result_Json += ",";
-                }
-                //Result_Json += snap2.key + "</p>" + JSON.stringify(snap2.val()) + "</p>";  
-                Result_Json += JSON.stringify(snap2.val());  
-                Childnum++;          
+    //            if (Childnum != 0) {
+    //                Result_Json += ",";
+    //            }
+    //            //Result_Json += snap2.key + "</p>" + JSON.stringify(snap2.val()) + "</p>";  
+    //            Result_Json += JSON.stringify(snap2.val());  
+    //            Childnum++;          
+    //        }
+    //    });
+    //});
+
+    //Result_Json += ']}';
+    //res.send(Result_Json);
+    
+    firebase.database().ref().child('Stores').on('value', function (snapshot) {
+        var result = []
+        snapshot.forEach(function (childSnapshot) {
+            if (childSnapshot.key.includes(searchName)) {
+                var obj = {}
+                obj[childSnapshot.key] = childSnapshot.val()
+                result.push(obj)
             }
         });
+        res.json(result[0])
     });
-
-    Result_Json += ']}';
-    res.send(Result_Json);
- 
 
 
 })

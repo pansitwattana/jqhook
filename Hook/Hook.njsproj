@@ -5,7 +5,7 @@
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
     <Name>Hook</Name>
     <RootNamespace>Hook</RootNamespace>
-    <NameOfLastUsedPublishProfile>jqhook - Web Deploy (2)</NameOfLastUsedPublishProfile>
+    <NameOfLastUsedPublishProfile>jqhook - Web Deploy</NameOfLastUsedPublishProfile>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -34,6 +34,8 @@
     <Compile Include="app.js" />
     <Compile Include="routes\database.js" />
     <Compile Include="routes\index.js" />
+    <Compile Include="routes\menu.js" />
+    <Compile Include="routes\order.js" />
     <Compile Include="routes\search.js" />
     <Compile Include="routes\doneorder.js" />
     <Compile Include="routes\users.js" />

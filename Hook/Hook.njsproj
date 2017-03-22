@@ -35,6 +35,7 @@
     <Compile Include="routes\database.js" />
     <Compile Include="routes\index.js" />
     <Compile Include="routes\search.js" />
+    <Compile Include="routes\doneorder.js" />
     <Compile Include="routes\users.js" />
     <Compile Include="bin\www" />
     <None Include="jqhook - Web Deploy.pubxml" />

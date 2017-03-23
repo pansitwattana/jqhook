@@ -204,10 +204,10 @@ router.post('/', function (req, res) {
     res.send(email)
 })
 
-router.get('/add', function (req, res) {
+router.post('/add', function (req, res) {
 
-   // var neworder = req.body
-    var neworder = { ID: 1 ,Comment: 'sok',Data: '22',Customer_ID: 1,Type: 'Undone',Store_ID: 1, MenuList: [0, 1]}
+    var neworder = req.body
+    // var neworder = { ID: 1 ,Comment: 'sok',Data: '22',Customer_ID: 1,Type: 'Undone',Store_ID: 1, MenuList: [0, 1]}
     //{"Comment":"ok","Customer_ID":1,"Date":"22","ID":1,"Store_ID":1,"Type":"Done"}
 
      /*
@@ -222,20 +222,34 @@ router.get('/add', function (req, res) {
    // console.log(req.body)
 
     var ordernumber = 0
+    var checkSet = false;
     firebase.database().ref().child('Orders').on('value', function (OrderSnapshot) {
 
         var OrderData = {}
         var NewQueue = {}
-        OrderSnapshot.forEach(function (ChildSnapshot) {
-            OrderData = ChildSnapshot.val();
-            ordernumber++ 
-           
-            if (ordernumber == OrderSnapshot.val().length) {
-                
-                neworder.ID = ordernumber
 
+
+        OrderSnapshot.forEach(function (ChildSnapshot) {
+
+            if (!checkSet)
+            {
+                ordernumber++
+                
+            }
+
+            //console.log(ordernumber + "," + OrderSnapshot.val().length)
+
+            if (ordernumber == OrderSnapshot.val().length) {
+
+                checkSet = true;
+
+                neworder.ID = ordernumber
+                
                 firebase.database().ref().child('Orders/' + ordernumber).set(neworder)
-              
+                
+                NewQueue = GetQueue(ordernumber)
+                res.json(NewQueue)
+
             }                 
         })
 

@@ -129,7 +129,7 @@ function GetQueue(orderID)
     firebase.database().ref().child('Orders').on('value', function (OrderSnapshot) {
         OrderSnapshot.forEach(function (ChildSnapshot) {
             OrderData = ChildSnapshot.val();
-            if (OrderData.Store_ID == marketID && OrderData.Type == "Do") {
+            if (OrderData.Store_ID == marketID && OrderData.Type == "Undone") {
                 if (OrderData.ID < orderID) {
                     queue++;
                 }
@@ -207,6 +207,7 @@ router.post('/', function (req, res) {
 router.post('/add', function (req, res) {
 
     var neworder = req.body
+    // var neworder = { ID: 1 ,Comment: 'sok',Data: '22',Customer_ID: 1,Type: 'Undone',Store_ID: 1, MenuList: [0, 1]}
     //{"Comment":"ok","Customer_ID":1,"Date":"22","ID":1,"Store_ID":1,"Type":"Done"}
 
      /*
@@ -218,14 +219,55 @@ router.post('/add', function (req, res) {
     NewOrder["Type"] = "Do"
     */
 
-    firebase.database().ref().child('Orders/' + neworder.ID).set(neworder)
+   // console.log(req.body)
 
-    console.log(req.body)
+    var ordernumber = 0
+    var checkSet = false;
+    firebase.database().ref().child('Orders').on('value', function (OrderSnapshot) {
+
+        var OrderData = {}
+        var NewQueue = {}
 
 
-    var NewQueue = GetQueue(orderID)
+        OrderSnapshot.forEach(function (ChildSnapshot) {
 
-    res.json(NewQueue)
+            if (!checkSet)
+            {
+                ordernumber++
+                
+            }
+
+            //console.log(ordernumber + "," + OrderSnapshot.val().length)
+
+            if (ordernumber == OrderSnapshot.val().length) {
+
+                checkSet = true;
+
+                neworder.ID = ordernumber
+                
+                firebase.database().ref().child('Orders/' + ordernumber).set(neworder)
+                
+                NewQueue = GetQueue(ordernumber)
+                res.json(NewQueue)
+
+            }                 
+        })
+
+
+       
+
+      /*  neworder.ID = ordernumber
+        
+        firebase.database().ref().child('Orders/' + ordernumber).set(neworder) 
+              
+        NewQueue = GetQueue(ordernumber)
+        res.json(NewQueue)
+       */
+        
+    })
+     
+   
+    
 })
 
 

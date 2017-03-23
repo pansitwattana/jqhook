@@ -158,7 +158,7 @@ router.post('/', function (req, res) {
 
 router.post('/add', function (req, res) {
 
-    var NewOrder = req.body.order
+    var order = req.body
     //{"Comment":"ok","Customer_ID":1,"Date":"22","ID":1,"Store_ID":1,"Type":"Done"}
 
      /*
@@ -171,8 +171,16 @@ router.post('/add', function (req, res) {
    
     firebase.database().ref().child('Orders/3').set(NewOrder);
     */
+    console.log(req.body)
+    
+    var order = {
+        id: 0,
+        queue: 10,
+        time: 33
+    }
 
-    res.json(NewOrder)
+
+    res.json(order)
 })
 
 

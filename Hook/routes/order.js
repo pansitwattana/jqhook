@@ -70,18 +70,16 @@ router.get('/get/:marketname/', function (req, res) {
     var marketID = -1
     var result = {}
 
-   //Find MarketID
+    //Find MarketID
     firebase.database().ref().child('Stores').on('value', function (StoresSnapshot) {
         StoresSnapshot.forEach(function (ChildSnapshot) {
 
             if (ChildSnapshot.key.includes(marketName)) {
                 var obj = ChildSnapshot.val()
                 marketID = obj.ID
-
-                
+              
             }
-
-            
+       
         })
 
         // Find Order of Market
@@ -89,7 +87,20 @@ router.get('/get/:marketname/', function (req, res) {
             OrderSnapshot.forEach(function (ChildSnapshot) {
 
                 if (ChildSnapshot.val().Store_ID == marketID) {
-                    result[ChildSnapshot.key] = ChildSnapshot.val();
+
+                    var Obj = ChildSnapshot.val();
+
+                       Obj.MenuList.forEach(function (MenuListSnapshot, index) {
+                      
+                           // Find Menuname of Menulist
+                           firebase.database().ref().child('Menus/' + MenuListSnapshot).on('value', function (MenuSnapshot) {
+                               Obj.MenuList[index] = MenuSnapshot.val().Name
+                               console.log(MenuSnapshot.val().Name)
+                           })
+                          
+                           result[ChildSnapshot.key] = Obj;
+                    }) 
+
                 }
             })
 
@@ -125,11 +136,6 @@ router.get('/:id/done', function (req, res) {
             res.send("not found")
         }
      
-
-
-
-    
-
     res.send(OrderData)
 
 })
@@ -150,17 +156,21 @@ router.post('/', function (req, res) {
     res.send(email)
 })
 
-router.post('/set', function (req, res) {
+router.post('/add', function (req, res) {
+
+    var NewOrder = req.body.order
     //{"Comment":"ok","Customer_ID":1,"Date":"22","ID":1,"Store_ID":1,"Type":"Done"}
-    var NewOrder = {}
+
+     /*
     NewOrder["Comment"] =  "Good"
     NewOrder["Customer_ID"] = 1
     NewOrder["Date"] = 1 
     NewOrder["ID"] = 1
     NewOrder["Store_ID"] = 1
     NewOrder["Type"] = "Do"
-
-    firebase.database().child('Orders').setValue(NewOrder);
+   
+    firebase.database().ref().child('Orders/3').set(NewOrder);
+    */
 
     res.json(NewOrder)
 })

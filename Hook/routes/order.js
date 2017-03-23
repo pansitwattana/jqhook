@@ -115,6 +115,47 @@ router.get('/get/:marketname/', function (req, res) {
 
 })
 
+router.get('/:id/queue', function (req, res) {
+
+    var orderID = req.params.id;
+
+    var OrderData
+    firebase.database().ref().child('Orders/' + orderID).on('value', function (snapshot) {
+        OrderData = snapshot.val();
+    })
+
+    var marketID = OrderData.Store_ID
+    var orderID = OrderData.ID
+    var queue = 0;
+
+    firebase.database().ref().child('Orders').on('value', function (OrderSnapshot) {
+        OrderSnapshot.forEach(function (ChildSnapshot) {
+            OrderData = ChildSnapshot.val();
+            if (OrderData.Store_ID == marketID && OrderData.Type == "Do")
+            {
+                if (OrderData.ID < orderID )
+                {
+                    queue++;
+                }
+            }
+        })
+
+        console.log("OrderID: " + orderID + "MarketID: " + marketID + "Queue: " + queue)
+
+        var NewQueue = {}
+        NewQueue["ID"] = orderID
+        NewQueue["Queue"] = queue
+        NewQueue["time"] = 1
+
+        res.json(NewQueue)
+
+    })
+
+   
+
+
+})
+
 router.get('/:id/done', function (req, res) {
 
     var orderID = req.params.id;

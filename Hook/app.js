@@ -8,7 +8,6 @@ var bodyParser = require('body-parser')
 var routes = require('./routes/index')
 var users = require('./routes/users')
 var search = require('./routes/search')
-var doneorder = require('./routes/doneorder')
 var menu = require('./routes/menu')
 var order = require('./routes/order')
 var firebase = require('./routes/database')
@@ -31,6 +30,8 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.use('/', routes)
 app.use('/users', users)
 app.use('/search', search)
+app.use('/menu', menu)
+app.use('/order', order)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

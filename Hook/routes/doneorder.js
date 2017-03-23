@@ -11,8 +11,13 @@ router.get('/', function (req, res) {
 router.get('/:id', function (req, res) {
     var orderID = req.params.id;
 
+    var Tempdata;
+    firebase.database().ref().child('Orders/' + orderID).on('value', function (snapshot) {
+        Tempdata = snapshot.val();
+    }
+
     firebase.database().ref().child('Orders/' + orderID).set({
-        Type: "Done"
+
     });
 
     

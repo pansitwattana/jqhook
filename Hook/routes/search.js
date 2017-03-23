@@ -86,15 +86,16 @@ router.get('/:name', function (req, res) {
     //res.send(Result_Json);
     
     firebase.database().ref().child('Stores').on('value', function (snapshot) {
-        var result = []
+        var result = {}
         snapshot.forEach(function (childSnapshot) {
             if (childSnapshot.key.includes(searchName)) {
                 var obj = {}
-                obj[childSnapshot.key] = childSnapshot.val()
-                result.push(obj)
+                result[childSnapshot.key] = childSnapshot.val()
+                //obj[childSnapshot.key] = childSnapshot.val()
+                //result.push(obj)
             }
         });
-        res.json(result[0])
+        res.json(result)
     });
 
 

@@ -115,10 +115,8 @@ router.get('/get/:marketname/', function (req, res) {
 
 })
 
-router.get('/:id/queue', function (req, res) {
-
-    var orderID = req.params.id;
-
+function GetQueue(orderID)
+{
     var OrderData
     firebase.database().ref().child('Orders/' + orderID).on('value', function (snapshot) {
         OrderData = snapshot.val();
@@ -131,10 +129,8 @@ router.get('/:id/queue', function (req, res) {
     firebase.database().ref().child('Orders').on('value', function (OrderSnapshot) {
         OrderSnapshot.forEach(function (ChildSnapshot) {
             OrderData = ChildSnapshot.val();
-            if (OrderData.Store_ID == marketID && OrderData.Type == "Do")
-            {
-                if (OrderData.ID < orderID )
-                {
+            if (OrderData.Store_ID == marketID && OrderData.Type == "Do") {
+                if (OrderData.ID < orderID) {
                     queue++;
                 }
             }
@@ -142,16 +138,27 @@ router.get('/:id/queue', function (req, res) {
 
         console.log("OrderID: " + orderID + "MarketID: " + marketID + "Queue: " + queue)
 
-        var NewQueue = {}
-        NewQueue["ID"] = orderID
-        NewQueue["Queue"] = queue
-        NewQueue["time"] = 1
 
-        res.json(NewQueue)
 
+       
     })
 
-   
+    var NewQueue = {}
+
+    NewQueue["ID"] = orderID
+    NewQueue["Queue"] = queue
+    NewQueue["time"] = 1
+
+    return NewQueue
+}
+
+router.get('/:id/queue', function (req, res) {
+
+    var orderID = req.params.id;
+
+    var  NewQueue = GetQueue(orderID)
+
+    res.json(NewQueue)
 
 
 })
@@ -199,7 +206,7 @@ router.post('/', function (req, res) {
 
 router.post('/add', function (req, res) {
 
-    var order = req.body
+    var neworder = req.body
     //{"Comment":"ok","Customer_ID":1,"Date":"22","ID":1,"Store_ID":1,"Type":"Done"}
 
      /*
@@ -209,19 +216,16 @@ router.post('/add', function (req, res) {
     NewOrder["ID"] = 1
     NewOrder["Store_ID"] = 1
     NewOrder["Type"] = "Do"
-   
-    firebase.database().ref().child('Orders/3').set(NewOrder);
     */
+
+    firebase.database().ref().child('Orders/' + neworder.ID).set(neworder)
+
     console.log(req.body)
-    
-    var order = {
-        id: 0,
-        queue: 10,
-        time: 33
-    }
 
 
-    res.json(order)
+    var NewQueue = GetQueue(orderID)
+
+    res.json(NewQueue)
 })
 
 

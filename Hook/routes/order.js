@@ -124,7 +124,7 @@ function GetQueue(orderID)
 
     var marketID = OrderData.Store_ID
     var orderID = OrderData.ID
-    var queue = 0;
+    var queue = 1;
 
     firebase.database().ref().child('Orders').on('value', function (OrderSnapshot) {
         OrderSnapshot.forEach(function (ChildSnapshot) {
@@ -187,6 +187,29 @@ router.get('/:id/done', function (req, res) {
     res.send(OrderData)
 
 })
+
+router.get('/:id/cancel', function (req, res) {
+
+    var orderID = req.params.id;
+
+    var OrderData
+    firebase.database().ref().child('Orders/' + orderID).on('value', function (snapshot) {
+        OrderData = snapshot.val();
+    })
+
+
+    try {
+        OrderData['Type'] = "Cancel";
+        firebase.database().ref().child('Orders/' + orderID).update(OrderData)
+        res.send("success")
+    }
+    catch (err) {
+        res.send("not found")
+    }
+
+    res.send(OrderData)
+
+})
 /*
 router.get('/', function (req, res) {
 
@@ -219,7 +242,7 @@ router.post('/add', function (req, res) {
     NewOrder["Type"] = "Do"
     */
 
-   // console.log(req.body)
+   console.log(req.body)
 
     var ordernumber = 0
     var checkSet = false;

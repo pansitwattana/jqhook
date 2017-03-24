@@ -5,7 +5,7 @@
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
     <Name>Hook</Name>
     <RootNamespace>Hook</RootNamespace>
-    <NameOfLastUsedPublishProfile>jqhook - Web Deploy (3)</NameOfLastUsedPublishProfile>
+    <NameOfLastUsedPublishProfile>jqhook - Web Deploy</NameOfLastUsedPublishProfile>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -46,6 +46,10 @@
     <None Include="jqhook - FTP %282%29.pubxml" />
     <None Include="jqhook - Web Deploy %283%29.pubxml" />
     <None Include="jqhook - FTP %283%29.pubxml" />
+    <None Include="jqhook - Web Deploy %284%29.pubxml" />
+    <None Include="jqhook - FTP %284%29.pubxml" />
+    <None Include="jqhook - Web Deploy %285%29.pubxml" />
+    <None Include="jqhook - FTP %285%29.pubxml" />
     <Content Include="package.json" />
     <Content Include="public\stylesheets\style.styl" />
     <Content Include="README.md" />

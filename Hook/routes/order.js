@@ -64,7 +64,7 @@ router.get('/get/:id', function (req, res) {
 
 })*/
 
-router.get('/get/:marketname/', function (req, res) {
+router.get('/get/:marketname/', function (req,   res) {
 
     var marketName = req.params.marketname
     var marketID = -1

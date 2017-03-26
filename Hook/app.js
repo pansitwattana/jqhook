@@ -10,6 +10,9 @@ var users = require('./routes/users')
 var search = require('./routes/search')
 var menu = require('./routes/menu')
 var order = require('./routes/order')
+var browse = require('./routes/browse')
+var login = require('./routes/login')
+
 var firebase = require('./routes/database')
 
 var app = express()
@@ -40,6 +43,8 @@ app.use('/users', users)
 app.use('/search', search)
 app.use('/menu', menu)
 app.use('/order', order)
+app.use('/browse', browse)
+app.use('/login', login)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

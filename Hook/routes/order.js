@@ -201,7 +201,7 @@ router.get('/:id/cancel', function (req, res) {
     try {
         OrderData['Type'] = "Cancel";
         firebase.database().ref().child('Orders/' + orderID).update(OrderData)
-        res.send("success")
+        res.send(OrderData)
     }
     catch (err) {
         res.send("not found")

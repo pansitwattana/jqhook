@@ -9,9 +9,12 @@ app.initializeApp({
 	storageBucket: 'hook-f936a.appspot.com'
 })
 
+/*
 app.auth().signInWithEmailAndPassword('admin@hook.com', '123456789').catch(function(error){
 	if (error) throw error
 	//console.log(errorCode)
-})
+})*/
+
+
 
 module.exports = app

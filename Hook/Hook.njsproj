@@ -35,7 +35,9 @@
     <Compile Include="routes\database.js" />
     <Compile Include="routes\index.js" />
     <Compile Include="routes\menu.js" />
+    <Compile Include="routes\login.js" />
     <Compile Include="routes\order.js" />
+    <Compile Include="routes\browse.js" />
     <Compile Include="routes\search.js" />
     <Compile Include="routes\doneorder.js" />
     <Compile Include="routes\users.js" />

@@ -2,47 +2,65 @@
 var router = express.Router()
 var firebase = require('firebase')
 
-
+/*
 router.get('/:username&:password', function (req,   res) {
 
+    var result = {}
     var username = req.params.username
     var password = req.params.password
+*/
+router.post('/', function (req, res) {
+
+    var Userdata = {}
+    var username = req.body.username
+    var password = req.body.password
+    //var loginerror = false
+
+    console.log("req.body")
+    console.log(req.body)
 
     console.log(username + "," + password)
 
-    firebase.auth().signInWithEmailAndPassword(username, password).catch(function (error) {
+        Promise.all([
 
-        res.error = error
+            firebase.auth().signInWithEmailAndPassword(username, password).catch(function (error) {
 
+                console.log("Sign in error")
+                console.log(error)
+                res.error = error
+             //   loginerror = true
 
-        
+            })
 
+        ]).then(function (Snap) {
+            console.log("Sign in done")
+            var Logindata = Snap[0]
 
-    })
+           if (Logindata) {
+               var uid = Logindata.uid
+                firebase.database().ref().child('Users/' + uid).once('value', function (user) {
 
-    var result = {}
-    firebase.database().ref().child('Users').on('value', function (UserSnapshot) {
-
-
-        UserSnapshot.forEach(function (ChildSnapshot) {
-            console.log(ChildSnapshot.val().Email + "sss")
-            if (ChildSnapshot.val().Email == username) {
-                
-                result[ChildSnapshot.key] = ChildSnapshot.val()
-
+                    Userdata[user.key] = user.val()
+                    console.log(Userdata)
+                    res.json(Userdata)
+                })
             }
+            else {
+                res.json(Userdata)
+            }
+
         })
 
+    
+        
+      
+
+
+
+
+
+
     })
-
-    res.json(result)
-
-
-    })
-
-  
-
-
 
 
 module.exports = router

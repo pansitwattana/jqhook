@@ -12,6 +12,7 @@ var menu = require('./routes/menu')
 var order = require('./routes/order')
 var browse = require('./routes/browse')
 var login = require('./routes/login')
+var logout = require('./routes/logout')
 
 var firebase = require('./routes/database')
 
@@ -25,6 +26,8 @@ var allowCrossDomain = function (req, res, next) {
 // view engine setup
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'jade')
+
+
 
 app.use(allowCrossDomain);
 
@@ -45,6 +48,7 @@ app.use('/menu', menu)
 app.use('/order', order)
 app.use('/browse', browse)
 app.use('/login', login)
+app.use('/logout', logout)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -53,12 +57,25 @@ app.use(function (req, res, next) {
 	next(err)
 })
 
+var requireAuthentication = function requireAuthentication(req, res)
+{
+    console.log("Unauthorized")
+}
+
+app.all('*', requireAuthentication);
+
 // error handlers
 
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
-	app.use(function (err, req, res, next) {
+
+    app.use(function (err, req, res, next) {
+
+        if (firebase.auth().currentUser == null) {
+
+        }
+
 		res.status(err.status || 500)
 		res.render('error', {
 			message: err.message,
@@ -70,11 +87,18 @@ if (app.get('env') === 'development') {
 // production error handler
 // no stacktraces leaked to user
 app.use(function (err, req, res, next) {
-	res.status(err.status || 500)
-	res.render('error', {
-		message: err.message,
-		error: {}
-	})
+
+   
+
+        res.status(err.status || 500)
+        res.render('error', {
+            message: err.message,
+            error: {}
+        })
+
+    
+
+
 })
 
 module.exports = app

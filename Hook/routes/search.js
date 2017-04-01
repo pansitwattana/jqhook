@@ -44,6 +44,8 @@ router.get('/', function (req, res) {
 router.get('/:name', function (req, res) {
 	var searchName = req.params.name
 
+    
+
     // //var result = find(searchjson, searchName);
     // function match(element) {
     //     return element.name == searchName;

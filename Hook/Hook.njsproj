@@ -40,7 +40,10 @@
     <Compile Include="routes\login.js" />
     <Compile Include="routes\order.js" />
     <Compile Include="routes\browse.js" />
+    <Compile Include="routes\homepage.js" />
+    <Compile Include="routes\signup.js" />
     <Compile Include="routes\search.js" />
+    <Compile Include="routes\admin.js" />
     <Compile Include="routes\users.js" />
     <Compile Include="bin\www" />
     <None Include="jqhook - Web Deploy.pubxml" />

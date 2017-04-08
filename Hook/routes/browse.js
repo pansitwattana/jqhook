@@ -14,6 +14,7 @@ var router = express.Router()
 
 
 router.get('/:latlong', function (req, res) {
+
     var browse_input = req.params.latlong
     var browse_split = browse_input.split(",")
     var lat = browse_split[0]
@@ -29,7 +30,7 @@ router.get('/:latlong', function (req, res) {
             var tarlat = OrderData.Location.Lat
             var tarlong = OrderData.Location.Long
 
-            OrderData.Location = GetDistant(lat, long, tarlat, tarlong)
+            OrderData.Distant = GetDistant(lat, long, tarlat, tarlong)
 
             result[ChildSnapshot.key] = OrderData;
 
@@ -40,12 +41,27 @@ router.get('/:latlong', function (req, res) {
     })
 })
 
-    function GetDistant(Cenlat, Cenlong, Tarlat, Tarlong)
-    {
-        
-        var distant = Math.sqrt(Math.pow(Cenlat - Tarlat, 2) + Math.pow(Cenlong - Tarlong, 2))
-        console.log(distant)
-        return distant
-    }
+  //  function GetDistant(Cenlat, Cenlong, Tarlat, Tarlong)
+
+function GetDistant(lat1, lon1, lat2, lon2) {
+    var earthRadiusKm = 6371;
+
+    var dLat = degreesToRadians(lat2 - lat1);
+    var dLon = degreesToRadians(lon2 - lon1);
+
+    lat1 = degreesToRadians(lat1);
+    lat2 = degreesToRadians(lat2);
+
+    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+   
+    return earthRadiusKm * c;
+}
+
+function degreesToRadians(degrees) {
+    return degrees * Math.PI / 180;
+}
 
 module.exports = router

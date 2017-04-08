@@ -2,15 +2,20 @@
 var router = express.Router()
 var firebase = require('firebase')
 
+var OrderStatus  = {
+    Wait: 0,
+    Done: 1,
+    Cancel: 2,
+}
 
 router.get('/:order_id/wait', function (req, res) {
 
     var order = req.params.order_id
    
     firebase.database().ref("Orders/").once("child_changed", function (data) {
-                console.log("data")  
-                var queue =  GetQueue(order)         
-                res.json(queue)
+                   
+           GetQueue(res, order)
+           
             });
 
 })
@@ -29,25 +34,21 @@ router.get('/get/:marketid/', function (req, res) {
 
     Promise.all([
         path.child('/Orders').orderByChild("Store_ID").equalTo(marketid).once('value'),
-        path.child('/Menus').once('value'),
-        path.child('Users').once('value')
+        path.child('/Menus').once('value')
     ]).then(function (Snap) {
 
         var Orders = Snap[0].val()
         var Menus = Snap[1].val()
-        var Users = Snap[2].val()
 
-        //console.log(Orders['0']) Key
-
+        console.log(Orders)
         // Orders
-        try {
-                Orders.forEach(function (OrderSnapshot, orderkey) {
 
-                    var uid = Orders[orderkey].Customer_ID
-                    var user = Users[uid]
+        
+     try {
 
-                    Orders[orderkey].Customer_Name = user.Name + " " + user.Lastname
-                    delete Orders[orderkey].Customer_ID
+
+        Orders.forEach(function (OrderSnapshot, orderkey) {
+              
 
                     // Orders
 
@@ -57,15 +58,33 @@ router.get('/get/:marketid/', function (req, res) {
 
                         // console.log(menuid)
                         Orders[orderkey].MenuList[menukey] = menu.Name
+
                     })
                 })
 
-                console.log(Orders)
+               
+
+                // remove null
+                Orders = Orders.filter(function (x) {
+                    return (x !== (null || 'null' || ''));
+                });
+
                 result = Orders
                 res.json(result)
+
         }
         catch (err)
-        {
+     {
+         
+ 
+
+         for (var i in Orders)
+         {
+             console.log(i)
+             result = Orders[i];
+         }
+
+       
             res.json(result)
         }
 
@@ -74,202 +93,68 @@ router.get('/get/:marketid/', function (req, res) {
     })
 
 })
-/*
-router.get('/get/:marketid/', function (req, res) {
 
-    //chatsRef.orderByValue(‘user’).equalTo(‘user1’).once(‘value’, function (snap) {
-
-    var marketid = parseInt(req.params.marketid)
-    var result = {}
-
-    var path = firebase.database().ref()
-
-   // var OrderRef = path.child('Orders/' + userId)
-    //var MenuRef = path.child('/' + userId)
-
-    Promise.all([
-    path.child('Orders').orderByChild("Store_ID").equalTo(marketid).once('value')
-    ]).then(function (Snap) {
-
-        console.log("Get Order Val")
-
-
-        // Orders
-        for (var i = 0; i < Snap[0].numChildren(); i++) {
-            console.log(i)
-
-            console.log("Order_forEach")
-            var Order = Snap[0].val()[i]
-
-            //get Customername
-
-            path.child('Users/' + Order.Customer_ID).once('value', function (UserSnapshot) {
-                console.log("find user")
-                Order.Customer_Name = UserSnapshot.val().Name + " " + UserSnapshot.val().Lastname
-                delete Order.Customer_ID
-
-                for (var i = 0; i < Snap[0].numChildren(); i++) {
-                    Order.MenuList.forEach(function (MenuListSnapshot, index) {
-                        // Find Menuname of Menulist
-                        path.child('Menus/' + MenuListSnapshot).once('value', function (MenuSnapshot) {
-                            console.log("find menu")
-                            Order.MenuList[index] = MenuSnapshot.val().Name
-                            // Print menu name
-
-                        })
-                    })
-
-                    console.log("Add Result")
-                    result[Snap[0].key] = Order
-
-                }
-
-            })
-
-        }
-        console.log("Print")
-        res.json(result)
-
-    })
-       
-
-})
-
-*/
-    /*
-    path.child('Orders').orderByChild("Store_ID").equalTo(marketid).once('value', function (OrderSnapshot) {
-
-
-        // Orders
-        OrderSnapshot.val().forEach(function (ChildSnapshot) 
-        {
-            var OrderRef = path.child('Orders/' + ChildSnapshot.key)
-
-            result[OrderSnapshot.key] = OrderSnapshot.val()
-        })
-
-       
-       
-    })
-    */
-
-
-
-/*
-router.get('/get/:marketname/', function (req,   res) {
-
-    var marketName = req.params.marketname
-    var marketID = -1
-    
-    var result = {}
-
-    //Find MarketID
-    firebase.database().ref().child('Stores').once('value', function (StoresSnapshot) {
-
-        StoresSnapshot.forEach(function (ChildSnapshot) {
-            if (ChildSnapshot.key == marketName) {
-                var obj = ChildSnapshot.val()
-                marketID = obj.ID
-
-            }
-
-        })
-
-        console.log("stop find market")
-    }).then(function () {
-
-        console.log("then find order")
-
-        // Find Order of Market
-        firebase.database().ref().child('Orders').once('value', function (OrderSnapshot) {
-
-            console.log("in find order")
-
-            OrderSnapshot.forEach(function (ChildSnapshot) {
-
-                if (ChildSnapshot.val().Store_ID == marketID) {
-
-                    var Obj = ChildSnapshot.val();
-                    //result[ChildSnapshot.key] = Obj;
-
-                    // Find Custommer Name
-                    try {
-                        firebase.database().ref().child('Users/' + Obj.Customer_ID).on('value', function (UserSnapshot) {
-
-                            console.log("find user")
-                            Obj.Customer_Name = UserSnapshot.val().Name + " " + UserSnapshot.val().Lastname
-                            Obj.MenuList.forEach(function (MenuListSnapshot, index) {
-
-                                try {
-                                    // Find Menuname of Menulist
-                                    firebase.database().ref().child('Menus/' + MenuListSnapshot).on('value', function (MenuSnapshot) {
-                                        console.log("find menu")
-                                        Obj.MenuList[index] = MenuSnapshot.val().Name
-                                        // Print menu name
-
-                                        console.log(MenuSnapshot.val().Name)
-
-                                        result[ChildSnapshot.key] = Obj;
-
-                                    })
-                                }
-                                catch (err) {
-                                    console.log("Find Menuname of Menulist Error : " + err)
-                                }
-
-                            })
-
-                        }).then
-                    }
-                    catch (err) {
-                        console.log("Find Custommer Name Error : " + err)
-                    }
-
-
-                }
-
-                
-            })
-
-            console.log("end find order")
-
-        }).then(function () {
-
-            console.log("print")
-            try {
-
-                res.json(result)
-
-            }
-            catch (err) {
-                res.send(" Can't send  (" + err + ")")
-            }
-
-            })
-         
-    })
-
-   
-
-})
-*/
-
-
-function GetQueue(orderID)
+function GetQueue(res, orderid)
 {
+
+
     var OrderData
     var NewQueue = {}
+    var queue = 0
+    var status = 0
+
+    var marketID
 
     // Find Order Data
-    try {
+   // try {
 
-        firebase.database().ref().child('Orders/' + orderID).once('value', function (snapshot) {
+        Promise.all([
+            firebase.database().ref().child('/Orders').once('value')
+        ]).then(function (Snap) {
+
+            OrderData = Snap[0].val()
+            marketID = OrderData[orderid].Store_ID
+            status = OrderData[orderid].Status
+
+            OrderData.forEach(function (OrderSnapshot, orderindex) {
+
+                var Snap_store_id = OrderData[orderindex].Store_ID
+                var Snap_type = OrderData[orderindex].Status
+                var Snap_id = OrderData[orderindex].ID
+              
+
+               // console.log(Snap_store_id + " " + Snap_type)
+
+                if (Snap_store_id == marketID && Snap_type == OrderStatus.Wait) {
+                    if( Snap_id <= orderid ) {
+                        queue++;
+                    }
+                }
+
+
+
+
+
+            })
+
+            NewQueue["ID"] = parseInt(orderid)
+            NewQueue["Queue"] = queue
+            NewQueue["Time"] = 1
+            NewQueue["Status"] = status
+
+            console.log("OrderID: " + orderid + " MarketID: " + marketID + " Queue: " + queue + " Status: " + status)
+
+            res.json(NewQueue)
+
+            })
+/*
+        , function (snapshot) {
             OrderData = snapshot.val();
         })
 
-        var marketID = OrderData.Store_ID
+        
         var orderID = OrderData.ID
-        var queue = 0;
+        
 
         firebase.database().ref().child('Orders').once('value', function (OrderSnapshot) {
             OrderSnapshot.forEach(function (ChildSnapshot) {
@@ -285,26 +170,23 @@ function GetQueue(orderID)
 
         })
 
-        NewQueue["ID"] = orderID
-        NewQueue["Queue"] = queue
-        NewQueue["time"] = 1
+     
 
     }
     catch (err) {
         console.log("Find Order Data Error : " + err)
     }   
+*/
 
-    return NewQueue
+
 
 }
 
 router.get('/:id/queue', function (req, res) {
 
     var orderID = req.params.id;
-
-    var  NewQueue = GetQueue(orderID)
-
-    res.json(NewQueue)
+    GetQueue(res, orderID)
+   
 
 
 })
@@ -314,23 +196,32 @@ router.get('/:id/done', function (req, res) {
     var orderID = req.params.id;
 
     var OrderData
-    firebase.database().ref().child('Orders/' + orderID).once('value', function (snapshot) {
-        OrderData = snapshot.val();
+
+    Promise.all([
+
+        firebase.database().ref().child('Orders/' + orderID).once('value', function (snapshot) {
+            OrderData = snapshot.val();
+        })
+    ]).then(function (Snap) {
+
+        try {
+            OrderData['Status'] = OrderStatus.Done;
+            firebase.database().ref().child('Orders/' + orderID).update(OrderData)
+
+            OrderData.response = "Success"
+        }
+        catch (err) {           
+
+            OrderData.response = "Not Found"
+        }
+
+        res.send(OrderData)
+
     })
 
-
-        try
-        {   
-            OrderData['Type'] = "Done";
-            firebase.database().ref().child('Orders/' + orderID).update(OrderData)
-          //  res.send("success")
-        }
-        catch(err)
-        {
-           // res.send("not found")
-        }
+      
      
-    res.send(OrderData)
+ 
 
 })
 
@@ -339,28 +230,37 @@ router.get('/:id/cancel', function (req, res) {
     var orderID = req.params.id;
 
     var OrderData
+
+    Promise.all([
     firebase.database().ref().child('Orders/' + orderID).once('value', function (snapshot) {
         OrderData = snapshot.val();
     })
+    ]).then(function (Snap) {
 
+        try {
+            OrderData['Status'] = OrderStatus.Cancel;
+            firebase.database().ref().child('Orders/' + orderID).update(OrderData)
 
-    try {
-        OrderData['Type'] = "Cancel";
-        firebase.database().ref().child('Orders/' + orderID).update(OrderData)
+            OrderData.response = "Success"
+        }
+        catch (err) {
+            res.send("not found")
+
+            OrderData.response = "Not Found"
+        }
+
         res.send(OrderData)
-    }
-    catch (err) {
-        res.send("not found")
-    }
 
-    res.send(OrderData)
+    })
+
 
 })
 
+
 router.post('/add', function (req, res) {
 
-    var neworder = req.body
-    // var neworder = { ID: 1 ,Comment: 'sok',Data: '22',Customer_ID: 1,Type: 'Undone',Store_ID: 1, MenuList: [0, 1]}
+     var neworder = req.body
+    //var neworder = { "ID": -1, "Name": "Gai", "LastName": "Lowvapong", "Comment": "-", "Status": "Undone", "Date": "0:10:27", "Store_ID": 1, "MenuList": [0, 1] }
     //{"Comment":"ok","Customer_ID":1,"Date":"22","ID":1,"Store_ID":1,"Type":"Done"}
 
      /*
@@ -372,14 +272,12 @@ router.post('/add', function (req, res) {
     NewOrder["Type"] = "Do"
     */
 
+    console.log("Add Order")
+    var NewQueue = {}
     var ordernumber = 0
     var checkSet = false
 
     firebase.database().ref().child('Orders').once('value', function (OrderSnapshot) {
-
-        var OrderData = {}
-        var NewQueue = {}
-
 
         OrderSnapshot.forEach(function (ChildSnapshot) {
 
@@ -396,17 +294,16 @@ router.post('/add', function (req, res) {
                 checkSet = true;
 
                 neworder.ID = ordernumber
-                
-                firebase.database().ref().child('Orders/' + ordernumber).set(neworder)
-                
-                NewQueue = GetQueue(ordernumber)
+                neworder.Date = Date()
 
-                try {
-                    res.json(NewQueue)                   
-                }
-                catch (err) {
-                    res.send(" Can't add neworder (" + err + ")")
-                }
+                Promise.all([
+                    firebase.database().ref().child('Orders/' + ordernumber).set(neworder)
+                ]).then(function (Snap) {
+
+                    console.log("Add Compete")
+                    NewQueue = GetQueue(res,ordernumber)
+                })
+               
               
 
             }                 

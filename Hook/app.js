@@ -5,6 +5,9 @@ var logger = require('morgan')
 var cookieParser = require('cookie-parser')
 var bodyParser = require('body-parser')
 
+
+var admin = require('./routes/admin')
+
 var routes = require('./routes/index')
 var users = require('./routes/users')
 var search = require('./routes/search')
@@ -13,6 +16,9 @@ var order = require('./routes/order')
 var browse = require('./routes/browse')
 var login = require('./routes/login')
 var logout = require('./routes/logout')
+var signup = require('./routes/signup')
+
+var homepage = require('./routes/homepage') 
 
 var firebase = require('./routes/database')
 
@@ -42,6 +48,9 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 
 app.use('/', routes)
+
+app.use('/admin', admin)
+
 app.use('/users', users)
 app.use('/search', search)
 app.use('/menu', menu)
@@ -49,6 +58,9 @@ app.use('/order', order)
 app.use('/browse', browse)
 app.use('/login', login)
 app.use('/logout', logout)
+app.use('/signup', signup)
+
+app.use('/homepage', homepage)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

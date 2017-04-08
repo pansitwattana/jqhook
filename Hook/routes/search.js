@@ -90,7 +90,9 @@ router.get('/:name', function (req, res) {
     firebase.database().ref().child('Stores').on('value', function (snapshot) {
         var result = {}
         snapshot.forEach(function (childSnapshot) {
-            if (childSnapshot.key.includes(searchName)) {
+
+            var marketname = childSnapshot.key.toLowerCase();
+            if (marketname.includes(searchName.toLowerCase()) ) {
                 var obj = {}
                 result[childSnapshot.key] = childSnapshot.val()
                 //obj[childSnapshot.key] = childSnapshot.val()

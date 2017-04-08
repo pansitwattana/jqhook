@@ -15,16 +15,13 @@ app.initializeApp({
 })
 
 
-/*
+
 app.auth().signInWithEmailAndPassword('admin@hook.com', '123456789').catch(function(error){
 	if (error) throw error
     //console.log(errorCode)
 })
-*/
 
-var user = firebase.auth().currentUser
-if (!user) { console.log("nologin") }
-else { console.log("Logined") }
+
 
 firebase.auth().onAuthStateChanged(function (user) {
     if (user) {

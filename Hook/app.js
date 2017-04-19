@@ -17,6 +17,7 @@ var browse = require('./routes/browse')
 var login = require('./routes/login')
 var logout = require('./routes/logout')
 var signup = require('./routes/signup')
+var store = require('./routes/store')
 
 var homepage = require('./routes/homepage') 
 
@@ -59,6 +60,7 @@ app.use('/browse', browse)
 app.use('/login', login)
 app.use('/logout', logout)
 app.use('/signup', signup)
+app.use('/store', store)
 
 app.use('/homepage', homepage)
 

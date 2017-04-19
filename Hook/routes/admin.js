@@ -50,4 +50,45 @@ router.get('/addAttb/:Tablename&:Attbname&:Attbval', function (req, res) {
 
 })
 
+router.get('/removeAttb/:Tablename&:Attbname', function (req, res) {
+
+    var tablename = req.params.Tablename;
+    var attbname = req.params.Attbname;
+
+    var Snapresult = {}
+    Promise.all([
+
+        firebase.database().ref().child(tablename).once('value')
+
+    ]).then(function (Snap) {
+
+        var Snapresult = Snap[0].val()
+        //  console.log(Snapresult)
+        if (Snapresult) {
+
+            Snap[0].forEach(function (Snapshot) {
+
+                delete Snapresult[Snapshot.key][attbname]
+
+
+            })
+
+            console.log(Snapresult)
+
+            firebase.database().ref().child(tablename).set(Snapresult).then(function (Snap) {
+                res.json(Snapresult)
+            })
+
+        }
+        else {
+            res.json(Snapresult)
+        }
+
+
+
+
+    })
+
+})
+
 module.exports = router

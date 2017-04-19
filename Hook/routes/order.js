@@ -11,12 +11,26 @@ var OrderStatus  = {
 router.get('/:order_id/wait', function (req, res) {
 
     var order = req.params.order_id
-   
-    firebase.database().ref("Orders/").once("child_changed", function (data) {
-                   
-           GetQueue(res, order)
-           
+
+    Promise.all([
+        firebase.database().ref("Orders/" + order).once("value")
+    ]).then(function (Snap) {
+        var OrderData = Snap[0].val()
+        if (OrderData.Status == OrderStatus.Wait) {
+
+            firebase.database().ref("Orders").once("child_changed", function (data) {
+
+                GetQueue(res, order)
+
             });
+
+        } else
+        {
+            GetQueue(res, order)
+        }
+
+     })
+
 
 })
 
@@ -33,7 +47,7 @@ router.get('/get/:marketid/', function (req, res) {
     console.log(marketid)
 
     Promise.all([
-        path.child('/Orders').orderByChild("Store_ID").equalTo(marketid).once('value'),
+        path.child('/Orders').once('value'),
         path.child('/Menus').once('value')
     ]).then(function (Snap) {
 
@@ -44,37 +58,48 @@ router.get('/get/:marketid/', function (req, res) {
         // Orders
 
         
-     try {
+    try {
 
 
         Orders.forEach(function (OrderSnapshot, orderkey) {
-              
 
-                    // Orders
+            
+            if (Orders[orderkey].Store_ID == marketid) {
+                // Orders
+               // console.log(Orders[orderkey].Store_ID + " = " + marketid)
 
-                    Orders[orderkey].MenuList.forEach(function (MenuListSnapshot, menukey) {
-                        var menuid = MenuListSnapshot
-                        var menu = Menus[menuid]
+                Orders[orderkey].MenuList.forEach(function (MenuListSnapshot, menukey) {
+                    var menuid = MenuListSnapshot
+                    var menu = Menus[menuid]
 
-                        // console.log(menuid)
-                        Orders[orderkey].MenuList[menukey] = menu.Name
+                    // console.log(menuid)
+                    Orders[orderkey].MenuList[menukey] = menu.Name
 
-                    })
+
+
                 })
 
-               
+            } else
+            {
+                delete Orders[orderkey]
+            }
+                
+                })
+
+             
 
                 // remove null
                 Orders = Orders.filter(function (x) {
                     return (x !== (null || 'null' || ''));
                 });
 
+                console.log(Orders)
                 result = Orders
                 res.json(result)
 
-        }
+       }
         catch (err)
-     {
+    {
          
  
 
@@ -87,8 +112,8 @@ router.get('/get/:marketid/', function (req, res) {
        
             res.json(result)
         }
-
-      
+    
+     
 
     })
 

@@ -6,7 +6,7 @@
     <Name>Hook</Name>
     <RootNamespace>Hook</RootNamespace>
     <NameOfLastUsedPublishProfile>jqhook - Web Deploy (6)</NameOfLastUsedPublishProfile>
-    <NodeExePath>C:\Users\Minami\AppData\Roaming\npm\nodemon.cmd</NodeExePath>
+    <NodeExePath>C:\Program Files\nodejs\node.exe</NodeExePath>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -36,6 +36,7 @@
     <Compile Include="routes\database.js" />
     <Compile Include="routes\index.js" />
     <Compile Include="routes\logout.js" />
+    <Compile Include="routes\feedback.js" />
     <Compile Include="routes\store.js" />
     <Compile Include="routes\menu.js" />
     <Compile Include="routes\login.js" />

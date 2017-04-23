@@ -1,6 +1,7 @@
 ﻿var express = require('express')
 var router = express.Router()
 var firebase = require('firebase')
+var moment = require('moment')
 
 var OrderStatus  = {
     Wait: 0,
@@ -229,16 +230,12 @@ router.get('/:id/done', function (req, res) {
         })
     ]).then(function (Snap) {
 
-        try {
-            OrderData['Status'] = OrderStatus.Done;
-            firebase.database().ref().child('Orders/' + orderID).update(OrderData)
+        OrderData.Status = OrderStatus.Done
+        OrderData.StopTime = moment().format('H:m:s')
+        OrderData.OrderTime = DiffTime(OrderData.StartTime, OrderData.StopTime)
+        firebase.database().ref().child('Orders/' + orderID).update(OrderData)
 
-            OrderData.response = "Success"
-        }
-        catch (err) {           
-
-            OrderData.response = "Not Found"
-        }
+        OrderData.response = "Success"
 
         res.send(OrderData)
 
@@ -249,6 +246,22 @@ router.get('/:id/done', function (req, res) {
  
 
 })
+
+function DiffTime(StartTime, StopTime)
+{
+    // unit is Sec
+    
+
+
+    var StartTime_Arr = StartTime.split(":");
+    var StartTime = 0.00
+     StartTime = (StartTime_Arr[0] * 60) + (StartTime_Arr[1]) + (StartTime_Arr[2] / 60)
+     var StopTime_Arr = StopTime.split(":");
+     var StopTime = 0.00
+     StopTime = (StopTime_Arr[0] * 60) + (StopTime_Arr[1]) + (StopTime_Arr[2] / 60)
+    console.log(StopTime + " " + StartTime + " = " + ( StopTime - StartTime ))
+    return (StopTime - StartTime)
+}
 
 router.get('/:id/cancel', function (req, res) {
 
@@ -281,22 +294,20 @@ router.get('/:id/cancel', function (req, res) {
 
 })
 
+router.get('/add/test', function (req, res) {
+     var neworder = { "Name": "Gai", "LastName": "Lowvapong", "Comment": "-", "Status": 0, "Store_ID": 1, "MenuList": [0, 1] }
+     AddOrder(neworder,res)
+})
 
 router.post('/add', function (req, res) {
 
-     var neworder = req.body
-    //var neworder = { "ID": -1, "Name": "Gai", "LastName": "Lowvapong", "Comment": "-", "Status": "Undone", "Date": "0:10:27", "Store_ID": 1, "MenuList": [0, 1] }
-    //{"Comment":"ok","Customer_ID":1,"Date":"22","ID":1,"Store_ID":1,"Type":"Done"}
+    var neworder = req.body
+    AddOrder(neworder, res)
 
-     /*
-    NewOrder["Comment"] =  "Good"
-    NewOrder["Customer_ID"] = 1
-    NewOrder["Date"] = 1 
-    NewOrder["ID"] = 1
-    NewOrder["Store_ID"] = 1
-    NewOrder["Type"] = "Do"
-    */
+})
 
+function AddOrder(neworder, res)
+{
     console.log("Add Order")
     var NewQueue = {}
     var ordernumber = 0
@@ -307,9 +318,8 @@ router.post('/add', function (req, res) {
         OrderSnapshot.forEach(function (ChildSnapshot) {
 
             // check if find new order number
-            if (!checkSet)
-            {
-                ordernumber++               
+            if (!checkSet) {
+                ordernumber++
             }
 
             //console.log(ordernumber + "," + OrderSnapshot.val().length)
@@ -319,27 +329,31 @@ router.post('/add', function (req, res) {
                 checkSet = true;
 
                 neworder.ID = ordernumber
-                neworder.Date = Date()
+                neworder.Date = moment().format('D/M/YYYY')
+                neworder.StartTime = moment().format('H:m:s')
+                neworder.StopTime = 0
+                neworder.OrderTime = 0
 
                 Promise.all([
                     firebase.database().ref().child('Orders/' + ordernumber).set(neworder)
                 ]).then(function (Snap) {
 
                     console.log("Add Compete")
-                    NewQueue = GetQueue(res,ordernumber)
+                    NewQueue = GetQueue(res, ordernumber)
                 })
-               
-              
 
-            }                 
+
+
+            }
         })
 
-        
+
     })
-     
-   
-    
-})
+
+
+}
+
+
 
 router.get('/:id', function (req, res) {
 

@@ -75,6 +75,7 @@ function Login(username, password,usertype, res)
             firebase.database().ref().child('Users/' + uid).once('value', function (user) {
 
                 Userdata = user.val()
+                Userdata.ID = user.key
                 console.log(Userdata.Type + "  " + usertype)
 
                 if (Userdata.Type == usertype) {

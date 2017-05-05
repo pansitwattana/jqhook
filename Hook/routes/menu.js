@@ -32,7 +32,10 @@ router.get('/get/:marketname', function (req, res) {
                 }
             })
 
-            res.json(result)
+            try { res.json(result) }
+            catch (err)
+            { res.json("Network Error") }
+
         })
 
     })
@@ -74,7 +77,11 @@ function Addtag(menuid,tagval,res)
 
             console.log("Add Tag Compete")
             console.log(result)
-            res.json(result)
+
+            try { res.json(result) }
+            catch (err)
+            { res.json("Network Error") }
+
         })
 
     })
@@ -125,7 +132,12 @@ function Addmenu(Menudata, res) {
         ]).then(function (Snap) {
 
             console.log("Add Compete")
-            res.json(Menudata)
+
+            try { res.json(Menudata) }
+            catch (err)
+            { res.json("Network Error") }
+
+     
         })
     })
 }

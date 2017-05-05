@@ -31,4 +31,9 @@ firebase.auth().onAuthStateChanged(function (user) {
     } 
 })
 
+function helloworld()
+{
+    console.log("hello")
+}
+
 module.exports = app

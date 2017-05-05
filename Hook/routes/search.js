@@ -1,125 +1,123 @@
 ﻿var express = require('express')
 var firebase = require('firebase')
 var router = express.Router()
+var moment = require('moment')
 
-// var write = function writeUserData(userId, name, email, imageUrl) {
-//     firebase.database().ref('users/' + userId).set({
-//         username: name,
-//         email: email,
-//         profile_picture : imageUrl
-//     });
-// }
-
-/* GET users listing. */
+var OrderStatus = {
+    Wait: 0,
+    Done: 1,
+    Cancel: 2,
+}
 router.get('/', function (req, res) {
-    //res.json(searchjson);
-    //var db = GetFireDB();
-    // var db = firebase.database();
-    // db.child("Feedback/1/Detail").on("value", function(snapshot) {
-    //     alert(snapshot.val());  // Alerts "San Francisco"
-    // });
-    // res.end("Test db");
-    //res.json(db);
-    // var detail 
     
+    firebase.database().ref().child('Orders').on('value', function (OrderSnapshot) {
+        OrdersData = OrderSnapshot.val()
+        firebase.database().ref().child('Stores').on('value', function (snapshot) {
+            var result = {}
+            snapshot.forEach(function (childSnapshot) {
 
-    // var id = firebase.auth().currentUser.uid;
-    // write(id, 'admin', 'admin@hook.com', '/google.com');
+                var marketname = childSnapshot.key.toLowerCase();
+   
+                    var StoreData = childSnapshot.val()
+                    StoreData.Status = GetStoreOpenorClose(StoreData.ID, StoreData)
+                    StoreData.OrderReport = GetQueueReport(StoreData.ID, OrdersData, moment().format('D/M/YYYY'))  //
+                    result[childSnapshot.key] = StoreData
+                    //obj[childSnapshot.key] = childSnapshot.val()
+                    //result.push(obj)
+                
+            })
 
-    // var userId = firebase.auth().currentUser.uid;
-    // var read = firebase.database().ref('/users/' + userId).once('value').then(function(snapshot){
-    //     username = snapshot.val().username;
-    // });
-    // console.log(userId);
-    // console.log(username);
+            try { res.json(result) }
+            catch (err)
+            { res.json("Network Error") }
 
-    //var userId = firebase.auth().currentUser.uid;
-	var dbRefObject = firebase.database().ref().child('Stores')
-	dbRefObject.once('value').then(function(snapshot){
-    	res.json(snapshot.val())
-	})
+        })
+    })
 });
-
 
 router.get('/:name', function (req, res) {
 	var searchName = req.params.name
 
-    
+    firebase.database().ref().child('Orders').on('value', function (OrderSnapshot) {
+        OrdersData = OrderSnapshot.val()
+        firebase.database().ref().child('Stores').on('value', function (snapshot) {
+            var result = {}
+            snapshot.forEach(function (childSnapshot) {
 
-    // //var result = find(searchjson, searchName);
-    // function match(element) {
-    //     return element.name == searchName;
-    // }
-
-
-    // var storeResults = searchjson.stores.filter(match);
-
-    // var searchResult = { stores: storeResults };
-
-    // res.json(searchResult);
-
-    //------------------------------------------------------------------------
-	/*var dbRefObject = firebase.database().ref().child('Stores/' + searchName)
-	dbRefObject.once('value').then(function(snapshot){
-		res.json(snapshot.val())
-    }) */
-    //------------------------------------------------------------------------
+                var marketname = childSnapshot.key.toLowerCase();
+                if (marketname.includes(searchName.toLowerCase()) ) {
+                    var StoreData = childSnapshot.val()
+                    StoreData.Status = GetStoreOpenorClose(StoreData.ID, StoreData)
+                    StoreData.OrderReport = GetQueueReport(StoreData.ID, OrdersData, moment().format('D/M/YYYY'))  //
+                    result[childSnapshot.key] = StoreData
+                    //obj[childSnapshot.key] = childSnapshot.val()
+                    //result.push(obj)
+                }
+            })
 
 
+            try { res.json(result) }
+            catch (err)
+            { res.json("Network Error") }
 
-    //var Result_Json = ' { "Stores" : [ ';
-    //var Childnum = 0;
 
-    //firebase.database().ref().child('Stores').on('value', function (snap) {
-    //    snap.forEach(function (snap2) {
-    //        if (snap2.key.includes(searchName)) {
-
-    //            if (Childnum != 0) {
-    //                Result_Json += ",";
-    //            }
-    //            //Result_Json += snap2.key + "</p>" + JSON.stringify(snap2.val()) + "</p>";  
-    //            Result_Json += JSON.stringify(snap2.val());  
-    //            Childnum++;          
-    //        }
-    //    });
-    //});
-
-    //Result_Json += ']}';
-    //res.send(Result_Json);
-    
-    firebase.database().ref().child('Stores').on('value', function (snapshot) {
-        var result = {}
-        snapshot.forEach(function (childSnapshot) {
-
-            var marketname = childSnapshot.key.toLowerCase();
-            if (marketname.includes(searchName.toLowerCase()) ) {
-                var obj = {}
-                result[childSnapshot.key] = childSnapshot.val()
-                //obj[childSnapshot.key] = childSnapshot.val()
-                //result.push(obj)
-            }
-        });
-        res.json(result)
-    });
-
+        })
+    })
 
 })
 
-// function GetFireDB()
-// {
-//     // Set the configuration for your app
-//     // TODO: Replace with your project's config object
-//     var config = {
-//         apiKey: "AIzaSyBW3LXE8QvIvAWmcQLEJEfRu4MMy5-EbFA",
-//         authDomain: "hook-f936a.firebaseapp.com",
-//         databaseURL: "https://hook-f936a.firebaseio.com",
-//         storageBucket: "hook-f936a.appspot.com"
-//     };
-//     firebase.initializeApp(config);
+function GetQueueReport(StoreID, OrdersData, Date) {
+    var Result = { "Queue_num": 0, "Queue_AvgTime": 0 }
 
-//     // Get a reference to the database service
-//     var database = firebase.database();
-//     return database;
-// }
+    var Queue_num = 0
+    var Queue_AllTime = 0.00
+    var Queue_AvgTime = 0.00
+
+    // Count Queue
+    OrdersData.forEach(function (OrderSnapshot, MenuListkey) {
+
+
+
+        //console.log(OrderSnapshot.Store_ID)
+        if (OrderSnapshot.Store_ID == StoreID && OrderSnapshot.Date == Date && OrderSnapshot.Status == OrderStatus.Done) {
+            Queue_num++
+            Queue_AllTime += OrderSnapshot.OrderTime
+        }
+
+    })
+
+    if (Queue_num != 0) { Queue_AvgTime = Queue_AllTime / Queue_num }
+
+
+    Result.Queue_num = Queue_num
+    Result.Queue_AvgTime = Queue_AvgTime
+
+    console.log(Result)
+
+    return Result
+
+}
+
+function GetStoreOpenorClose(StoreID, StoresData) {
+    var Result = "Open"
+    var Timenow = moment().format('H:m:s')
+
+    var OpenTime = StoresData.Open + ":0"
+    var CloseTime = StoresData.Close + ":0"
+
+    var OpenTime_arr = OpenTime.split(":");
+    var CloseTime_arr = OpenTime.split(":");
+    var Timenow_arr = OpenTime.split(":");
+
+    if ((Timenow_arr[0] >= OpenTime_arr[0] && Timenow_arr[1] >= OpenTime_arr[1]) && (Timenow_arr[0] <= CloseTime_arr[0] && Timenow_arr[1] <= CloseTime_arr[1]))
+    { Result = "Open" }
+    else
+    { Result = "Close" }
+
+    return Result
+}
+
+
+
 
 module.exports = router

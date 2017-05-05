@@ -96,7 +96,12 @@ router.get('/get/:marketid/', function (req, res) {
 
                 console.log(Orders)
                 result = Orders
-                res.json(result)
+
+                try { res.json(result)  }
+                catch (err)
+                { res.json("Network Error") }
+
+             
 
        }
         catch (err)
@@ -170,7 +175,11 @@ function GetQueue(res, orderid)
 
             console.log("OrderID: " + orderid + " MarketID: " + marketID + " Queue: " + queue + " Status: " + status)
 
-            res.json(NewQueue)
+
+
+            try { res.json(NewQueue) }
+            catch (err)
+            { console.log("Network Error") }
 
             })
 /*
@@ -237,7 +246,10 @@ router.get('/:id/done', function (req, res) {
 
         OrderData.response = "Success"
 
-        res.send(OrderData)
+        try { res.json(OrderData) }
+        catch (err)
+        { res.json("Network Error") }
+      
 
     })
 
@@ -287,7 +299,9 @@ router.get('/:id/cancel', function (req, res) {
             OrderData.response = "Not Found"
         }
 
-        res.send(OrderData)
+        try { res.json(OrderData) }
+        catch (err)
+        { console.log("Network Error") }
 
     })
 

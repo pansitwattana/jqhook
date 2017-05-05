@@ -94,25 +94,40 @@ function Login(username, password,usertype, res)
 
                         }).then(function (Snap) {
                             console.log(Userdata)
-                            res.json(Userdata)
+
+                            try { res.json(Userdata) }
+                            catch (err)
+                            { res.json("Network Error") }
+
                         })
 
                     }
                     else {  // normal user
                         console.log(Userdata)
-                        res.json(Userdata)
+
+                        try { res.json(Userdata) }
+                        catch (err)
+                        { res.json("Network Error") }
+
                     }
                 } else  // error login type
                 {
                      Userdata = { "response": "Login fail user not found" }
-                    console.log(Userdata)
-                    res.json(Userdata)
+                     console.log(Userdata)
+
+                     try { res.json(Userdata) }
+                     catch (err)
+                     { res.json("Network Error") }
+
                 }
 
             })
         }
         else {
-            res.json(Userdata)
+
+            try { res.json(Userdata) }
+            catch (err)
+            { res.json("Network Error") }
           
         }
 

@@ -57,12 +57,19 @@ function Register(Register_data, res) {
                 firebase.database().ref().child('Users/' + uid).set(newuser)
             ]).then(function (Snap2) {
                 console.log("Firebase save done")
-                res.json(response)
+
+                try { res.json(response) }
+                catch (err)
+                { res.json("Network Error") }
+
+  
             })
         }
         else {
 
-            res.json(response)
+            try { res.json(response) }
+            catch (err)
+            { res.json("Network Error") }
         }
 
 

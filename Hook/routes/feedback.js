@@ -29,7 +29,10 @@ router.get('/get/:marketid', function (req, res) {
 
        
         console.log(result)
-        res.json(result)
+
+        try { res.json(result) }
+        catch (err)
+        { res.json("Network Error") }
     })
 
 })
@@ -40,7 +43,7 @@ router.get('/add/test', function (req, res) {
         "Detail": "อาหารอร่อยมาก",
         "Rate": 4,
         "Receiver": 4,
-        "Sender": "HSjRqk2ClfbaKpQSGzpUgiI1gV52",
+        "Sender": "admin@hook.com",
         "Subject": "TestAdd",
         "Type": 0
     }
@@ -137,14 +140,24 @@ function SaveNewfeedUsertoMarket(Avgrate, FeedbackMarketID, NewFeedbackID, Feedb
 
             })
             console.log('Stores/' + Storename)
-            Promise.all([
-                firebase.database().ref().child('Stores/' + Storename).set(Storedata),
-                firebase.database().ref().child('Feedbacks/' + NewFeedbackID).set(Feedbackdata)
-            ]).then(function (Snap) {
 
-                console.log("Add Compete")
-                res.json(Feedbackdata)
-            })
+            try {
+                Promise.all([
+                    firebase.database().ref().child('Stores/' + Storename).set(Storedata),
+                    firebase.database().ref().child('Feedbacks/' + NewFeedbackID).set(Feedbackdata)
+                ]).then(function (Snap) {
+
+                    console.log("Add Compete")
+
+                    var result = { "response": "Success"}
+                    res.json(result)
+                })
+            } catch (err) {
+
+                var result = { "response": "Error can't add new feedback" }
+                res.json(result)
+            }
+
 
         })
 
@@ -161,7 +174,10 @@ function SaveNewfeedMarkettoUser(NewFeedbackID, Feedbackdata,res) {
     ]).then(function (Snap) {
 
         console.log("Add Compete")
+
         res.json(Feedbackdata)
+
+
         })
 
 }

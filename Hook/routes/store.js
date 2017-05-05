@@ -28,6 +28,7 @@ function AddStore(Storedata, res)
         })
 
         Storedata.ID = NewStoreID
+
         var storename = Storedata.Name
 
         Promise.all([
@@ -35,7 +36,13 @@ function AddStore(Storedata, res)
         ]).then(function (Snap) {
 
             console.log("Add Compete")
-            res.json(Storedata)
+            delete Storedata.Owner_ID
+
+            try { res.json(Storedata) }
+            catch (err)
+            { res.json("Network Error") }
+
+       
         })
     })
 }
@@ -43,8 +50,9 @@ function AddStore(Storedata, res)
 router.get('/add/test', function (req, res) {
 
     var newstore = {
-        "ID": -1, "Name": "TestMarket", "Img": "abc.img", "Thumnail": "abc.img", "Address": "12345"
-        , "Owner_ID": "HSjRqk2ClfbaKpQSGzpUgiI1gV52", "Open": "True", "Rate": 0, "Location": { "lat" : 1.2442, "long" : 10.224 }
+        "ID": -1, "Name": "TestMarket", "Img": "abc.img", "Thumnail": "abc.img", "Address": "12345", "Category": "Rice"
+        , "Open": "8:00", "Close": "17:00" , "Tel" : "088222365"
+        , "Owner_ID": "HSjRqk2ClfbaKpQSGzpUgiI1gV52", "Rate": 0, "Location": { "lat" : 1.2442, "long" : 10.224 }
     }
 
 
@@ -121,7 +129,12 @@ function Getincome(Storename, Date, res)
         Result.Income = income
 
         console.log(Result)
-        res.json(Result)
+
+
+        try { res.json(Result) }
+        catch (err)
+        { res.json("Network Error") }
+
         })
 
 }
@@ -130,8 +143,8 @@ function Getincome(Storename, Date, res)
 function CalSumMenuListPrice(OrderSnapshot, MenuDatas ) {
     var SumMenuListincome = 0
 
-    OrderSnapshot.MenuList.forEach(function (MenuListSnapshot, MenuListkey) {
-        SumMenuListincome += MenuDatas[MenuListkey].Price
+    OrderSnapshot.MenuList.forEach(function (MenuListSnapshot) {
+        SumMenuListincome += MenuDatas[MenuListSnapshot].Price
     })
 
     return SumMenuListincome
@@ -163,7 +176,10 @@ router.get('/:storename/getsummary/', function (req, res) {
         Result.OrderReport = OrderReport
         Result.QueueReport = QueueReport
 
-        res.json(Result)
+        try { res.json(Result) }
+        catch (err)
+        { res.json("Network Error") }
+
     })
 
 })
@@ -200,8 +216,8 @@ function GetMenuReport(OrderSnapshot, MenuDatas, MenuReport) {
         if (MenuReport[MenuKey] == null)
         {
             console.log("Null")
-            MenuReport[MenuKey] = { "Count": 0, "Price"  : 0 , "Name"  : MenuDatas[MenuListkey].Name }
-
+            MenuReport[MenuKey] = { "Count": 1, "Price": MenuDatas[MenuKey].Price, "Name": MenuDatas[MenuKey].Name }
+            console.log(MenuDatas)
             console.log(MenuReport[MenuKey])
 
         }
@@ -225,7 +241,7 @@ function GetQueueReport(StoreID, OrdersData, Date)
 
 
         //console.log(OrderSnapshot.Store_ID)
-        if (OrderSnapshot.Store_ID == StoreID && OrderSnapshot.Date == Date)
+        if (OrderSnapshot.Store_ID == StoreID && OrderSnapshot.Date == Date && OrderSnapshot.Status == OrderStatus.Done)
         {
             Queue_num++
             Queue_AllTime += OrderSnapshot.OrderTime
@@ -233,7 +249,7 @@ function GetQueueReport(StoreID, OrdersData, Date)
 
     })
 
-    Queue_AvgTime = Queue_AllTime / Queue_num
+    if (Queue_num != 0) { Queue_AvgTime = Queue_AllTime / Queue_num }
 
     Result.Queue_num = Queue_num
     Result.Queue_AvgTime = Queue_AvgTime
